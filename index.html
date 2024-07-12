@@ -45,7 +45,8 @@
                     </div>
                 </div> <!-- FIM seção img -->
 
-                <div class="col-md-6">
+                <div class="col-md-6" v-if="etapa == 1">
+                    <!-- diretiva p/ renderização condicional --> 
 
                     <!-- TIPO do Pão -->
                     <div class="row mt-2">
@@ -168,17 +169,37 @@
                     <!-- Fazer Pedido -->
                     <div class="row mt-2">
                         <!--     button    Fazer pedido    -->
+                             <div class="col d-flex justify-content-end">
+                                <button type="button" class="btn btn-primary" @click="fazerPedido()">
+                                    Fazer pedido
+                                </button>
+                             </div>
                     </div>
                 </div> <!-- Fim col md -->
-
-                <div class="col-md-6">
+                <!-- Etapa 2 -->
+                <div class="col-md-6" v-if="etapa == 2">
+                    <!-- diretiva p/ renderização condicional --> 
                     <div class="row mt-2">
                         <div class="col">
                             <div class="card">
 
                                 <!-- Titulo Informe seus dados -->
+                                 <div class="card-header">
+                                    Informe seus Dados
+
+                                 </div>
 
                                 <!-- card-body Informe seus dados -->
+                                 <div class="card-body">
+                                    <div class="mb-3">
+                                        <label class="form-label">Nome</label>
+                                        <input type="text" class="form-control" v-model="inputNome">
+                                    </div>
+                                    <div class="mb-3">
+                                        <label class="form-label">Endereço</label>
+                                        <input type="text" class="form-control" v-model="inputEndereco">
+                                    </div>
+                                 </div>
 
                             </div> <!--  FIM card -->
                         </div> <!-- col -->
@@ -186,9 +207,13 @@
 
                     <div class="row mt-2">
                         <div class="col d-flex justify-content-between">
-
                             <!-- Voltar para o Lanche  -->
-
+                            <button type="button" class="btn btn-warning" @click="etapa -= 1">
+                                Voltar para o lanche 
+                            </button>
+                            <button type="button" class="btn btn-success" @click="confirmarPedido()">
+                                Confirmar
+                            </button>
                         </div>
                     </div>
                 </div> <!-- fim col md 6 -->
@@ -198,8 +223,15 @@
                     <div class="row mt-2">
                         <div class="col">
                             <div class="card">
-
                                 <!--  PEDIDO CONFIRMADO -->
+                                  <div class="card-header">
+                                    Pedido Confirmado
+                                  </div>
+                                  <div class="card-body">
+                                    <p> Agora é só aguardar 10 minutos!</p>
+                                    <p>Vamos chamar você em breve.</p>
+
+                                  </div>
 
                             </div>
                         </div>
@@ -207,9 +239,13 @@
                     <!-- Repetir pedido -->
                     <div class="row mt-2">
                         <div class="col d-flex justify-content-between">
-
                             <!-- button Repetir Pedido -->
-
+                             <button type="button" class="btn btn-primary" @click="etapa = 1">
+                                Repetir Pedido
+                             </button>
+                             <button type="button" class="btn btn-success" @click="novoPedido()">
+                                Novo Pedido
+                             </button>
                         </div>
                     </div>
                 </div>
@@ -227,6 +263,10 @@
                 inputSalada: [],      //array - checkbox - opcional
                 inputMolhos: [], 
                 inputHamburguer: '',
+                etapa: 1, // v-if
+                inputNome: '',
+                inputEndereco: '',
+                novoPedidoAssincrono: null
             },
             // propriedade computada  - reativos
             computed: {
@@ -279,6 +319,45 @@
                             return 'imagens/padrao/hamburguer.png'
                     }
                 },
+            },
+            methods: {
+                fazerPedido() {
+                    //se Pao e Carne definidos
+                    if(this.inputTipoPao && this.inputHamburguer) {
+                        this.etapa = 2 //avança p/ etapa fechar pedido
+                    } 
+                        else {
+                            alert ('Você precisa selecionar no minimo um pão e uma carne')
+                    }
+                },
+                confirmarPedido() {
+                    if(this.inputNome && this.inputEndereco) {
+                        this.etapa = 3
+
+                        this.novoPedidoAssincrono = setTimeout (() => this.novoPedido(), 5000)
+                    }
+                    else {
+                        alert ('Você precisa informar o seu nome e endereço.')  //pop up
+                    }
+
+                },
+                novoPedido () {
+                    this.etapa = 1
+
+                    this.inputTipoPao = ''
+                    this.inputSalada = []
+                    this.inputMolhos = []
+                    this.inputHamburguer = ''
+                    this.inputNome = ''
+                    this.inputEndereco = ''
+                },
+            },
+            watch: {
+                etapa(novoValor) {
+                    if(novoValor == 1) {
+                    clearTimeout(this.novoPedidoAssincrono)
+                    }
+                }
             },
         })
      </script>
